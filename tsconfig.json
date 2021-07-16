@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "strict": true,
+    "noImplicitAny": true,
+    // json을 모듈로서 불러오기 위해 esModuleInterop와 함께 사용
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    // 테스트 코드로만 실행하므로 js, source-map 등과 같은 파일을 내보내지 않게 함
+    "noEmit": true
+  },
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "**/**.json"]
+}
