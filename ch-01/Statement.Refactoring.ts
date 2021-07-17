@@ -38,23 +38,23 @@ export function statement(invoice: Invoice, plays: Plays): string {
  * [point]
  * - 값이 바뀌지 않는 변수는 매개변수로 전달
  */
-function amountFor(perf: Performance, play: Play): number {
+function amountFor(performance: Performance, play: Play): number {
   let result = 0; // 명확한 이름으로 변경. thisAmount -> result
 
   switch (play.type) {
     case 'tragedy':
       result = 40000;
-      if (perf.audience > 30) {
-        result += 1000 * (perf.audience - 30);
+      if (performance.audience > 30) {
+        result += 1000 * (performance.audience - 30);
       }
       break;
 
     case 'comedy':
       result = 30000;
-      if (perf.audience > 20) {
-        result += 10000 + 500 * (perf.audience - 20);
+      if (performance.audience > 20) {
+        result += 10000 + 500 * (performance.audience - 20);
       }
-      result += 300 * perf.audience;
+      result += 300 * performance.audience;
       break;
 
     default:
