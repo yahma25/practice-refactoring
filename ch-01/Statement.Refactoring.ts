@@ -15,17 +15,21 @@ interface EnrichPerformance extends Performance {
 }
 
 export function statement(invoice: Invoice, plays: Plays): string {
-  const statementData: StatementData = {
-    customer: invoice.customer,
-    performances: invoice.performances.map(enrichPerformance),
-    totalAmount: 0,
-    totalVolumeCredits: 0,
-  };
-  statementData.totalAmount = totalAmount(statementData.performances);
-  statementData.totalVolumeCredits = totalVolumeCredits(
-    statementData.performances,
-  );
+  const statementData: StatementData = createStatementData(invoice, plays);
   return renderPlainText(statementData, plays);
+
+  function createStatementData(invoice: Invoice, plays: Plays): StatementData {
+    const result: StatementData = {
+      customer: invoice.customer,
+      performances: invoice.performances.map(enrichPerformance),
+      totalAmount: 0,
+      totalVolumeCredits: 0,
+    };
+    result.totalAmount = totalAmount(result.performances);
+    result.totalVolumeCredits = totalVolumeCredits(result.performances);
+
+    return result;
+  }
 
   // 불변성을 지키기 위해 얕은 복제
   function enrichPerformance(performance: Performance): EnrichPerformance {
