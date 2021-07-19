@@ -14,11 +14,7 @@ export function statement(invoice: Invoice, plays: Plays): string {
     // 한 번의 공연에 대한 요금을 계산
     let thisAmount: number = amountFor(perf);
 
-    // 포인트를 적립한다.
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    // 희극 관객 5명마다 추가 포인트를 제공한다.
-    if ('comedy' === playFor(perf).type)
-      volumeCredits += Math.floor(perf.audience / 5);
+    volumeCredits += volumeCreditsFor(perf);
 
     // 청구 내역을 출력한다.
     result += `${playFor(perf).name}: ${format(thisAmount / 100)} (${
@@ -60,6 +56,17 @@ export function statement(invoice: Invoice, plays: Plays): string {
     }
 
     return result;
+  }
+
+  function volumeCreditsFor(perf: Performance): number {
+    let volumeCredits: number = 0;
+
+    volumeCredits += Math.max(perf.audience - 30, 0);
+    if ('comedy' === playFor(perf).type) {
+      volumeCredits += Math.floor(perf.audience / 5);
+    }
+
+    return volumeCredits;
   }
 
   function playFor(performance: Performance): Play {
