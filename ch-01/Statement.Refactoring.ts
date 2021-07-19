@@ -9,6 +9,7 @@ interface StatementData {
 interface EnrichPerformance extends Performance {
   play: Play;
   amount: number;
+  volumeCredits: number;
 }
 
 export function statement(invoice: Invoice, plays: Plays): string {
@@ -26,6 +27,7 @@ export function statement(invoice: Invoice, plays: Plays): string {
     );
     result.play = playFor(result);
     result.amount = amountFor(result);
+    result.volumeCredits = volumeCreditsFor(result);
     return result;
 
     function playFor(performance: Performance): Play {
@@ -62,6 +64,17 @@ export function statement(invoice: Invoice, plays: Plays): string {
 
       return result;
     }
+
+    function volumeCreditsFor(performance: EnrichPerformance): number {
+      let result: number = 0;
+
+      result += Math.max(performance.audience - 30, 0);
+      if ('comedy' === performance.play.type) {
+        result += Math.floor(performance.audience / 5);
+      }
+
+      return result;
+    }
   }
 
   function renderPlainText(data: StatementData, plays: Plays): string {
@@ -90,7 +103,7 @@ export function statement(invoice: Invoice, plays: Plays): string {
     function totalVolumeCredits(): number {
       let result = 0;
       for (let perf of data.performances) {
-        result += volumeCreditsFor(perf);
+        result += perf.volumeCredits;
       }
 
       return result;
@@ -103,16 +116,5 @@ export function statement(invoice: Invoice, plays: Plays): string {
       currency: 'USD',
       minimumFractionDigits: 2,
     }).format(aNumber / 100);
-  }
-
-  function volumeCreditsFor(performance: EnrichPerformance): number {
-    let result: number = 0;
-
-    result += Math.max(performance.audience - 30, 0);
-    if ('comedy' === performance.play.type) {
-      result += Math.floor(performance.audience / 5);
-    }
-
-    return result;
   }
 }
