@@ -64,23 +64,23 @@ export function statement(invoice: Invoice, plays: Plays): string {
   }
 
   function totalVolumeCredits(): number {
-    let volumeCredits = 0;
+    let result = 0;
     for (let perf of invoice.performances) {
-      volumeCredits += volumeCreditsFor(perf);
+      result += volumeCreditsFor(perf);
     }
 
-    return volumeCredits;
+    return result;
   }
 
   function volumeCreditsFor(performance: Performance): number {
-    let volumeCredits: number = 0;
+    let result: number = 0;
 
-    volumeCredits += Math.max(performance.audience - 30, 0);
+    result += Math.max(performance.audience - 30, 0);
     if ('comedy' === playFor(performance).type) {
-      volumeCredits += Math.floor(performance.audience / 5);
+      result += Math.floor(performance.audience / 5);
     }
 
-    return volumeCredits;
+    return result;
   }
 
   function playFor(performance: Performance): Play {
