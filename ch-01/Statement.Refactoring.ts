@@ -86,22 +86,14 @@ export function statement(invoice: Invoice, plays: Plays): string {
   }
 
   function totalAmount(performances: EnrichPerformance[]): number {
-    let result: number = 0;
-    for (let perf of performances) {
-      // 한 번의 공연에 대한 요금을 계산
-      result += perf.amount;
-    }
-
-    return result;
+    return performances.reduce((result, perf) => result + perf.amount, 0);
   }
 
   function totalVolumeCredits(performances: EnrichPerformance[]): number {
-    let result = 0;
-    for (let perf of performances) {
-      result += perf.volumeCredits;
-    }
-
-    return result;
+    return performances.reduce(
+      (result, perf) => result + perf.volumeCredits,
+      0,
+    );
   }
 
   function renderPlainText(data: StatementData, plays: Plays): string {
