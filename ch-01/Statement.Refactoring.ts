@@ -1,21 +1,16 @@
 import { Invoice, Play, Plays, Performance } from './Types';
 
 export function statement(invoice: Invoice, plays: Plays): string {
-  let totalAmount = 0;
   let result = `청구 내역 (고객명: ${invoice.customer})\n`;
 
   for (let perf of invoice.performances) {
-    // 한 번의 공연에 대한 요금을 계산
-    let thisAmount: number = amountFor(perf);
-
     // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${usd(thisAmount)} (${
+    result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
       perf.audience
     }석)\n`;
-    totalAmount += thisAmount;
   }
 
-  result += `총액: ${usd(totalAmount)}\n`;
+  result += `총액: ${usd(totalAmount())}\n`;
   result += `적립 포인트: ${totalVolumeCredits()}점\n`;
   return result;
 
@@ -53,6 +48,16 @@ export function statement(invoice: Invoice, plays: Plays): string {
 
       default:
         throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
+    }
+
+    return result;
+  }
+
+  function totalAmount(): number {
+    let result: number = 0;
+    for (let perf of invoice.performances) {
+      // 한 번의 공연에 대한 요금을 계산
+      result += amountFor(perf);
     }
 
     return result;
