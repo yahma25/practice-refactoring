@@ -17,6 +17,12 @@ export interface Performance {
   audience: number;
 }
 
+export interface EnrichPerformance extends Performance {
+  play: Play;
+  amount: number;
+  volumeCredits: number;
+}
+
 export interface Invoice {
   customer: string;
   performances: Performance[];
