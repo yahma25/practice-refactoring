@@ -4,6 +4,8 @@ interface StatementData {
   customer: string;
   performances: EnrichPerformance[];
   play?: Play;
+  totalAmount: number;
+  totalVolumeCredits: number;
 }
 
 interface EnrichPerformance extends Performance {
@@ -16,7 +18,13 @@ export function statement(invoice: Invoice, plays: Plays): string {
   const statementData: StatementData = {
     customer: invoice.customer,
     performances: invoice.performances.map(enrichPerformance),
+    totalAmount: 0,
+    totalVolumeCredits: 0,
   };
+  statementData.totalAmount = totalAmount(statementData.performances);
+  statementData.totalVolumeCredits = totalVolumeCredits(
+    statementData.performances,
+  );
   return renderPlainText(statementData, plays);
 
   // 불변성을 지키기 위해 얕은 복제
@@ -77,6 +85,25 @@ export function statement(invoice: Invoice, plays: Plays): string {
     }
   }
 
+  function totalAmount(performances: EnrichPerformance[]): number {
+    let result: number = 0;
+    for (let perf of performances) {
+      // 한 번의 공연에 대한 요금을 계산
+      result += perf.amount;
+    }
+
+    return result;
+  }
+
+  function totalVolumeCredits(performances: EnrichPerformance[]): number {
+    let result = 0;
+    for (let perf of performances) {
+      result += perf.volumeCredits;
+    }
+
+    return result;
+  }
+
   function renderPlainText(data: StatementData, plays: Plays): string {
     let result = `청구 내역 (고객명: ${data.customer})\n`;
 
@@ -85,29 +112,10 @@ export function statement(invoice: Invoice, plays: Plays): string {
       result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
     }
 
-    result += `총액: ${usd(totalAmount())}\n`;
-    result += `적립 포인트: ${totalVolumeCredits()}점\n`;
+    result += `총액: ${usd(data.totalAmount)}\n`;
+    result += `적립 포인트: ${data.totalVolumeCredits}점\n`;
 
     return result;
-
-    function totalAmount(): number {
-      let result: number = 0;
-      for (let perf of data.performances) {
-        // 한 번의 공연에 대한 요금을 계산
-        result += perf.amount;
-      }
-
-      return result;
-    }
-
-    function totalVolumeCredits(): number {
-      let result = 0;
-      for (let perf of data.performances) {
-        result += perf.volumeCredits;
-      }
-
-      return result;
-    }
   }
 
   function usd(aNumber: number): string {
