@@ -8,10 +8,15 @@
 
 ## 개발 환경
 
-<br>
+### Node
 
-### Node - 별도의 View(html) 없이 JavaScript 소스 실행을 위함
+* 별도의 View(html) 렌더링 없이 JavaScript 소스 실행을 위함
 
-### TypeScript - TypeScript 숙련도 향상을 위함
+### TypeScript
 
-### Jest - 테스트 코드 숙련도 향상을 위함
+* TypeScript 숙련도 향상을 위함
+
+### Jest
+
+* 원본과 리팩터링한 코드의 결과가 동일한지 확인하기 위함
+* 테스트 코드 숙련도 향상을 위함
