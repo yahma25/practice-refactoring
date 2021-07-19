@@ -8,9 +8,14 @@ interface StatementData {
 export function statement(invoice: Invoice, plays: Plays): string {
   const statementData: StatementData = {
     customer: invoice.customer,
-    performances: invoice.performances.slice(),
+    performances: invoice.performances.map(enrichPerformance),
   };
   return renderPlainText(statementData, plays);
+
+  // 불변성을 지키기 위해 얕은 복제
+  function enrichPerformance(performance: Performance): Performance {
+    return Object.assign({}, performance);
+  }
 
   function renderPlainText(data: StatementData, plays: Plays): string {
     let result = `청구 내역 (고객명: ${data.customer})\n`;
