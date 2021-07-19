@@ -8,6 +8,7 @@ interface StatementData {
 
 interface EnrichPerformance extends Performance {
   play: Play;
+  amount: number;
 }
 
 export function statement(invoice: Invoice, plays: Plays): string {
@@ -24,10 +25,42 @@ export function statement(invoice: Invoice, plays: Plays): string {
       performance as EnrichPerformance,
     );
     result.play = playFor(result);
+    result.amount = amountFor(result);
     return result;
 
     function playFor(performance: Performance): Play {
       return plays[performance.playID];
+    }
+
+    /**
+     * 개수 구하기
+     * [point]
+     * - 값이 바뀌지 않는 변수는 매개변수로 전달
+     */
+    function amountFor(performance: EnrichPerformance): number {
+      let result = 0; // 명확한 이름으로 변경. thisAmount -> result
+
+      switch (performance.play.type) {
+        case 'tragedy':
+          result = 40000;
+          if (performance.audience > 30) {
+            result += 1000 * (performance.audience - 30);
+          }
+          break;
+
+        case 'comedy':
+          result = 30000;
+          if (performance.audience > 20) {
+            result += 10000 + 500 * (performance.audience - 20);
+          }
+          result += 300 * performance.audience;
+          break;
+
+        default:
+          throw new Error(`알 수 없는 장르: ${performance.play.type}`);
+      }
+
+      return result;
     }
   }
 
@@ -36,9 +69,7 @@ export function statement(invoice: Invoice, plays: Plays): string {
 
     for (let perf of data.performances) {
       // 청구 내역을 출력한다.
-      result += `${perf.play.name}: ${usd(amountFor(perf))} (${
-        perf.audience
-      }석)\n`;
+      result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
     }
 
     result += `총액: ${usd(totalAmount())}\n`;
@@ -50,7 +81,7 @@ export function statement(invoice: Invoice, plays: Plays): string {
       let result: number = 0;
       for (let perf of data.performances) {
         // 한 번의 공연에 대한 요금을 계산
-        result += amountFor(perf);
+        result += perf.amount;
       }
 
       return result;
@@ -72,37 +103,6 @@ export function statement(invoice: Invoice, plays: Plays): string {
       currency: 'USD',
       minimumFractionDigits: 2,
     }).format(aNumber / 100);
-  }
-
-  /**
-   * 개수 구하기
-   * [point]
-   * - 값이 바뀌지 않는 변수는 매개변수로 전달
-   */
-  function amountFor(performance: EnrichPerformance): number {
-    let result = 0; // 명확한 이름으로 변경. thisAmount -> result
-
-    switch (performance.play.type) {
-      case 'tragedy':
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
-        }
-        break;
-
-      case 'comedy':
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
-        }
-        result += 300 * performance.audience;
-        break;
-
-      default:
-        throw new Error(`알 수 없는 장르: ${performance.play.type}`);
-    }
-
-    return result;
   }
 
   function volumeCreditsFor(performance: EnrichPerformance): number {
