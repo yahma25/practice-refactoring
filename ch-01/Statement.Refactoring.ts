@@ -58,12 +58,12 @@ export function statement(invoice: Invoice, plays: Plays): string {
     return result;
   }
 
-  function volumeCreditsFor(perf: Performance): number {
+  function volumeCreditsFor(performance: Performance): number {
     let volumeCredits: number = 0;
 
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    if ('comedy' === playFor(perf).type) {
-      volumeCredits += Math.floor(perf.audience / 5);
+    volumeCredits += Math.max(performance.audience - 30, 0);
+    if ('comedy' === playFor(performance).type) {
+      volumeCredits += Math.floor(performance.audience / 5);
     }
 
     return volumeCredits;
