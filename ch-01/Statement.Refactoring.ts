@@ -1,12 +1,21 @@
 import { Invoice, Play, Plays, Performance } from './Types';
 
+interface StatementData {
+  customer: string;
+  performances: Performance[];
+}
+
 export function statement(invoice: Invoice, plays: Plays): string {
-  return renderPlainText(invoice, plays);
+  const statementData: StatementData = {
+    customer: invoice.customer,
+    performances: invoice.performances.slice(),
+  };
+  return renderPlainText(statementData, plays);
 
-  function renderPlainText(invoice: Invoice, plays: Plays): string {
-    let result = `청구 내역 (고객명: ${invoice.customer})\n`;
+  function renderPlainText(data: StatementData, plays: Plays): string {
+    let result = `청구 내역 (고객명: ${data.customer})\n`;
 
-    for (let perf of invoice.performances) {
+    for (let perf of data.performances) {
       // 청구 내역을 출력한다.
       result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
         perf.audience
@@ -17,6 +26,25 @@ export function statement(invoice: Invoice, plays: Plays): string {
     result += `적립 포인트: ${totalVolumeCredits()}점\n`;
 
     return result;
+
+    function totalAmount(): number {
+      let result: number = 0;
+      for (let perf of data.performances) {
+        // 한 번의 공연에 대한 요금을 계산
+        result += amountFor(perf);
+      }
+
+      return result;
+    }
+
+    function totalVolumeCredits(): number {
+      let result = 0;
+      for (let perf of data.performances) {
+        result += volumeCreditsFor(perf);
+      }
+
+      return result;
+    }
   }
 
   function usd(aNumber: number): string {
@@ -53,25 +81,6 @@ export function statement(invoice: Invoice, plays: Plays): string {
 
       default:
         throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
-    }
-
-    return result;
-  }
-
-  function totalAmount(): number {
-    let result: number = 0;
-    for (let perf of invoice.performances) {
-      // 한 번의 공연에 대한 요금을 계산
-      result += amountFor(perf);
-    }
-
-    return result;
-  }
-
-  function totalVolumeCredits(): number {
-    let result = 0;
-    for (let perf of invoice.performances) {
-      result += volumeCreditsFor(perf);
     }
 
     return result;
