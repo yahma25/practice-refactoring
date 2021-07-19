@@ -2,7 +2,12 @@ import { Invoice, Play, Plays, Performance } from './Types';
 
 interface StatementData {
   customer: string;
-  performances: Performance[];
+  performances: EnrichPerformance[];
+  play?: Play;
+}
+
+interface EnrichPerformance extends Performance {
+  play: Play;
 }
 
 export function statement(invoice: Invoice, plays: Plays): string {
@@ -13,8 +18,17 @@ export function statement(invoice: Invoice, plays: Plays): string {
   return renderPlainText(statementData, plays);
 
   // 불변성을 지키기 위해 얕은 복제
-  function enrichPerformance(performance: Performance): Performance {
-    return Object.assign({}, performance);
+  function enrichPerformance(performance: Performance): EnrichPerformance {
+    const result: EnrichPerformance = Object.assign(
+      {},
+      performance as EnrichPerformance,
+    );
+    result.play = playFor(result);
+    return result;
+
+    function playFor(performance: Performance): Play {
+      return plays[performance.playID];
+    }
   }
 
   function renderPlainText(data: StatementData, plays: Plays): string {
@@ -22,7 +36,7 @@ export function statement(invoice: Invoice, plays: Plays): string {
 
     for (let perf of data.performances) {
       // 청구 내역을 출력한다.
-      result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${
+      result += `${perf.play.name}: ${usd(amountFor(perf))} (${
         perf.audience
       }석)\n`;
     }
@@ -65,10 +79,10 @@ export function statement(invoice: Invoice, plays: Plays): string {
    * [point]
    * - 값이 바뀌지 않는 변수는 매개변수로 전달
    */
-  function amountFor(performance: Performance): number {
+  function amountFor(performance: EnrichPerformance): number {
     let result = 0; // 명확한 이름으로 변경. thisAmount -> result
 
-    switch (playFor(performance).type) {
+    switch (performance.play.type) {
       case 'tragedy':
         result = 40000;
         if (performance.audience > 30) {
@@ -85,24 +99,20 @@ export function statement(invoice: Invoice, plays: Plays): string {
         break;
 
       default:
-        throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
+        throw new Error(`알 수 없는 장르: ${performance.play.type}`);
     }
 
     return result;
   }
 
-  function volumeCreditsFor(performance: Performance): number {
+  function volumeCreditsFor(performance: EnrichPerformance): number {
     let result: number = 0;
 
     result += Math.max(performance.audience - 30, 0);
-    if ('comedy' === playFor(performance).type) {
+    if ('comedy' === performance.play.type) {
       result += Math.floor(performance.audience / 5);
     }
 
     return result;
-  }
-
-  function playFor(performance: Performance): Play {
-    return plays[performance.playID];
   }
 }
