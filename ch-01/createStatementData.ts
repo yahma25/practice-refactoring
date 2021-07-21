@@ -34,8 +34,8 @@ export function createStatementData(
       {},
       performance as EnrichPerformance,
     );
-    result.play = playFor(result);
-    result.amount = amountFor(result);
+    result.play = calculator.play;
+    result.amount = calculator.amount;
     result.volumeCredits = volumeCreditsFor(result);
 
     return result;
@@ -84,7 +84,7 @@ export function createStatementData(
 class PerformanceCalculator {
   constructor(
     private readonly performance: Performance,
-    private readonly play: Play,
+    public readonly play: Play,
   ) {}
 
   get amount(): number {
