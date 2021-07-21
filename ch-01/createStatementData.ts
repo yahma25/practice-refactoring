@@ -44,16 +44,6 @@ export function createStatementData(
       return plays[performance.playID];
     }
 
-    /**
-     * 개수 구하기
-     * [point]
-     * - 값이 바뀌지 않는 변수는 매개변수로 전달
-     */
-    function amountFor(performance: Performance): number {
-      return new PerformanceCalculator(performance, playFor(performance))
-        .amount;
-    }
-
     function volumeCreditsFor(performance: EnrichPerformance): number {
       let result: number = 0;
 
@@ -87,6 +77,11 @@ class PerformanceCalculator {
     public readonly play: Play,
   ) {}
 
+  /**
+   * 개수 구하기
+   * [point]
+   * - 값이 바뀌지 않는 변수는 매개변수로 전달
+   */
   get amount(): number {
     let result = 0; // 명확한 이름으로 변경. thisAmount -> result
 
