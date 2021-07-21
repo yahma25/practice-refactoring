@@ -36,23 +36,12 @@ export function createStatementData(
     );
     result.play = calculator.play;
     result.amount = calculator.amount;
-    result.volumeCredits = volumeCreditsFor(result);
+    result.volumeCredits = calculator.volumeCredits;
 
     return result;
 
     function playFor(performance: Performance): Play {
       return plays[performance.playID];
-    }
-
-    function volumeCreditsFor(performance: EnrichPerformance): number {
-      let result: number = 0;
-
-      result += Math.max(performance.audience - 30, 0);
-      if ('comedy' === performance.play.type) {
-        result += Math.floor(performance.audience / 5);
-      }
-
-      return result;
     }
   }
 
@@ -103,6 +92,17 @@ class PerformanceCalculator {
 
       default:
         throw new Error(`알 수 없는 장르: ${this.play.type}`);
+    }
+
+    return result;
+  }
+
+  get volumeCredits(): number {
+    let result: number = 0;
+
+    result += Math.max(this.performance.audience - 30, 0);
+    if ('comedy' === this.play.type) {
+      result += Math.floor(this.performance.audience / 5);
     }
 
     return result;
