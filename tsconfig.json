@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "target": "ES6",
     "strict": true,
     "noImplicitAny": true,
     // json을 모듈로서 불러오기 위해 esModuleInterop와 함께 사용

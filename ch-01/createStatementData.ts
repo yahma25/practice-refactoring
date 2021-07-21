@@ -25,59 +25,23 @@ export function createStatementData(
 
   // 불변성을 지키기 위해 얕은 복제
   function enrichPerformance(performance: Performance): EnrichPerformance {
+    const calculator: PerformanceCalculator = createPerformanceCalculator(
+      performance,
+      playFor(performance),
+    );
+
     const result: EnrichPerformance = Object.assign(
       {},
       performance as EnrichPerformance,
     );
-    result.play = playFor(result);
-    result.amount = amountFor(result);
-    result.volumeCredits = volumeCreditsFor(result);
+    result.play = calculator.play;
+    result.amount = calculator.amount;
+    result.volumeCredits = calculator.volumeCredits;
+
     return result;
 
     function playFor(performance: Performance): Play {
       return plays[performance.playID];
-    }
-
-    /**
-     * 개수 구하기
-     * [point]
-     * - 값이 바뀌지 않는 변수는 매개변수로 전달
-     */
-    function amountFor(performance: EnrichPerformance): number {
-      let result = 0; // 명확한 이름으로 변경. thisAmount -> result
-
-      switch (performance.play.type) {
-        case 'tragedy':
-          result = 40000;
-          if (performance.audience > 30) {
-            result += 1000 * (performance.audience - 30);
-          }
-          break;
-
-        case 'comedy':
-          result = 30000;
-          if (performance.audience > 20) {
-            result += 10000 + 500 * (performance.audience - 20);
-          }
-          result += 300 * performance.audience;
-          break;
-
-        default:
-          throw new Error(`알 수 없는 장르: ${performance.play.type}`);
-      }
-
-      return result;
-    }
-
-    function volumeCreditsFor(performance: EnrichPerformance): number {
-      let result: number = 0;
-
-      result += Math.max(performance.audience - 30, 0);
-      if ('comedy' === performance.play.type) {
-        result += Math.floor(performance.audience / 5);
-      }
-
-      return result;
     }
   }
 
@@ -90,5 +54,69 @@ export function createStatementData(
       (result, perf) => result + perf.volumeCredits,
       0,
     );
+  }
+}
+
+/**
+ * 팩토리 패턴을 사용하여 타입에 맞는 계산을 수행하는 서브 클래스 생성
+ */
+function createPerformanceCalculator(
+  performance: Performance,
+  play: Play,
+): PerformanceCalculator {
+  switch (play.type) {
+    case 'tragedy':
+      return new TragedyCalculator(performance, play);
+    case 'comedy':
+      return new ComedyCalculator(performance, play);
+  }
+}
+
+/**
+ * 조건부 로직을 다향성을 이용하여 처리하기 위해 계산 역할을 수행
+ */
+class PerformanceCalculator {
+  constructor(
+    protected readonly performance: Performance,
+    public readonly play: Play,
+  ) {}
+
+  /**
+   * 개수 구하기
+   * [point]
+   * - 값이 바뀌지 않는 변수는 매개변수로 전달
+   */
+  get amount(): number {
+    throw new Error('서브 클래스를 처리하도록 설계됨');
+  }
+
+  get volumeCredits(): number {
+    return Math.max(this.performance.audience - 30, 0);
+  }
+}
+
+class TragedyCalculator extends PerformanceCalculator {
+  get amount(): number {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
+
+class ComedyCalculator extends PerformanceCalculator {
+  get amount(): number {
+    let result = 30000;
+    if (this.performance.audience > 20) {
+      result += 10000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+
+    return result;
+  }
+
+  get volumeCredits(): number {
+    return super.volumeCredits + Math.floor(this.performance.audience / 5);
   }
 }
