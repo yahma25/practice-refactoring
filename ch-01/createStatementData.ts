@@ -77,7 +77,7 @@ function createPerformanceCalculator(
  */
 class PerformanceCalculator {
   constructor(
-    private readonly performance: Performance,
+    protected readonly performance: Performance,
     public readonly play: Play,
   ) {}
 
@@ -87,29 +87,7 @@ class PerformanceCalculator {
    * - 값이 바뀌지 않는 변수는 매개변수로 전달
    */
   get amount(): number {
-    let result = 0; // 명확한 이름으로 변경. thisAmount -> result
-
-    switch (this.play.type) {
-      case 'tragedy':
-        result = 40000;
-        if (this.performance.audience > 30) {
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
-
-      case 'comedy':
-        result = 30000;
-        if (this.performance.audience > 20) {
-          result += 10000 + 500 * (this.performance.audience - 20);
-        }
-        result += 300 * this.performance.audience;
-        break;
-
-      default:
-        throw new Error(`알 수 없는 장르: ${this.play.type}`);
-    }
-
-    return result;
+    throw new Error('서브 클래스를 처리하도록 설계됨');
   }
 
   get volumeCredits(): number {
@@ -124,6 +102,24 @@ class PerformanceCalculator {
   }
 }
 
-class TragedyCalculator extends PerformanceCalculator {}
+class TragedyCalculator extends PerformanceCalculator {
+  get amount(): number {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
 
-class ComedyCalculator extends PerformanceCalculator {}
+class ComedyCalculator extends PerformanceCalculator {
+  get amount(): number {
+    let result = 30000;
+    if (this.performance.audience > 20) {
+      result += 10000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+
+    return result;
+  }
+}
