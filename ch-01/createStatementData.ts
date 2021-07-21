@@ -25,7 +25,7 @@ export function createStatementData(
 
   // 불변성을 지키기 위해 얕은 복제
   function enrichPerformance(performance: Performance): EnrichPerformance {
-    const calculator: PerformanceCalculator = new PerformanceCalculator(
+    const calculator: PerformanceCalculator = createPerformanceCalculator(
       performance,
       playFor(performance),
     );
@@ -55,6 +55,13 @@ export function createStatementData(
       0,
     );
   }
+}
+
+function createPerformanceCalculator(
+  performance: Performance,
+  play: Play,
+): PerformanceCalculator {
+  return new PerformanceCalculator(performance, play);
 }
 
 /**
