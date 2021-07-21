@@ -49,30 +49,9 @@ export function createStatementData(
      * [point]
      * - 값이 바뀌지 않는 변수는 매개변수로 전달
      */
-    function amountFor(performance: EnrichPerformance): number {
-      let result = 0; // 명확한 이름으로 변경. thisAmount -> result
-
-      switch (performance.play.type) {
-        case 'tragedy':
-          result = 40000;
-          if (performance.audience > 30) {
-            result += 1000 * (performance.audience - 30);
-          }
-          break;
-
-        case 'comedy':
-          result = 30000;
-          if (performance.audience > 20) {
-            result += 10000 + 500 * (performance.audience - 20);
-          }
-          result += 300 * performance.audience;
-          break;
-
-        default:
-          throw new Error(`알 수 없는 장르: ${performance.play.type}`);
-      }
-
-      return result;
+    function amountFor(performance: Performance): number {
+      return new PerformanceCalculator(performance, playFor(performance))
+        .amount;
     }
 
     function volumeCreditsFor(performance: EnrichPerformance): number {
@@ -107,4 +86,30 @@ class PerformanceCalculator {
     private readonly performance: Performance,
     private readonly play: Play,
   ) {}
+
+  get amount(): number {
+    let result = 0; // 명확한 이름으로 변경. thisAmount -> result
+
+    switch (this.play.type) {
+      case 'tragedy':
+        result = 40000;
+        if (this.performance.audience > 30) {
+          result += 1000 * (this.performance.audience - 30);
+        }
+        break;
+
+      case 'comedy':
+        result = 30000;
+        if (this.performance.audience > 20) {
+          result += 10000 + 500 * (this.performance.audience - 20);
+        }
+        result += 300 * this.performance.audience;
+        break;
+
+      default:
+        throw new Error(`알 수 없는 장르: ${this.play.type}`);
+    }
+
+    return result;
+  }
 }
