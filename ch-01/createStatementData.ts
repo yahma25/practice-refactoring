@@ -57,11 +57,19 @@ export function createStatementData(
   }
 }
 
+/**
+ * 팩토리 패턴을 사용하여 타입에 맞는 계산을 수행하는 서브 클래스 생성
+ */
 function createPerformanceCalculator(
   performance: Performance,
   play: Play,
 ): PerformanceCalculator {
-  return new PerformanceCalculator(performance, play);
+  switch (play.type) {
+    case 'tragedy':
+      return new TragedyCalculator(performance, play);
+    case 'comedy':
+      return new ComedyCalculator(performance, play);
+  }
 }
 
 /**
@@ -115,3 +123,7 @@ class PerformanceCalculator {
     return result;
   }
 }
+
+class TragedyCalculator extends PerformanceCalculator {}
+
+class ComedyCalculator extends PerformanceCalculator {}
