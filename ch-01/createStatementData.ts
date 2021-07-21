@@ -25,6 +25,11 @@ export function createStatementData(
 
   // 불변성을 지키기 위해 얕은 복제
   function enrichPerformance(performance: Performance): EnrichPerformance {
+    const calculator: PerformanceCalculator = new PerformanceCalculator(
+      performance,
+      playFor(performance),
+    );
+
     const result: EnrichPerformance = Object.assign(
       {},
       performance as EnrichPerformance,
@@ -32,6 +37,7 @@ export function createStatementData(
     result.play = playFor(result);
     result.amount = amountFor(result);
     result.volumeCredits = volumeCreditsFor(result);
+
     return result;
 
     function playFor(performance: Performance): Play {
@@ -91,4 +97,14 @@ export function createStatementData(
       0,
     );
   }
+}
+
+/**
+ * 조건부 로직을 다향성을 이용하여 처리하기 위해 계산 역할을 수행
+ */
+class PerformanceCalculator {
+  constructor(
+    private readonly performance: Performance,
+    private readonly play: Play,
+  ) {}
 }
