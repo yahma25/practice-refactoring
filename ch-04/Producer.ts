@@ -9,7 +9,7 @@ export class Producer {
 
   private _production: number;
 
-  constructor(private province: Province, data: any) {
+  constructor(private province: Province, data: Producer) {
     this._cost = data.cost;
     this._name = data.name;
     this._production = data.production || 0;
@@ -36,5 +36,6 @@ export class Producer {
       typeof amountStr === 'string' ? parseInt(amountStr) : amountStr;
     const newProduction: number = Number.isNaN(amount) ? 0 : amount;
     this.province.totalProduction += newProduction - this._production;
+    this._production = newProduction;
   }
 }
