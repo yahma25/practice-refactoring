@@ -108,8 +108,8 @@ export function sampleProvinceData(): ProvinceData {
 export class ProvinceData {
   constructor(
     public readonly name: string,
-    public readonly price: number,
     public readonly producers: Producer[],
     public readonly demand: number,
+    public readonly price: number,
   ) {}
 }
